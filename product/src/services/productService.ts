@@ -7,39 +7,65 @@ const repository = new ProductRepository();
 
 export class ProductService {
   async getAllProducts() {
-    return repository.findAll();
+    try {
+      const products = await repository.findAll();
+      return {
+        success: true,
+        data: products,
+      };
+    } catch (error: any) {
+      return {
+        success: false,
+        message: error.message || 'Failed to fetch products',
+        statusCode: 500,
+      };
+    }
   }
 
   async getProductById(id: number) {
-    const product = await repository.findById(id);
-    if (!product) {
+    try {
+      const product = await repository.findById(id);
+      if (!product) {
+        return {
+          success: false,
+          message: 'Product not found',
+          statusCode: 404,
+        };
+      }
+      return {
+        success: true,
+        data: product,
+      };
+    } catch (error: any) {
       return {
         success: false,
-        message: 'Product not found',
-        statusCode: 404,
+        message: error.message || 'Failed to fetch product',
+        statusCode: 500,
       };
     }
-    return {
-      success: true,
-      data: product,
-    };
   }
 
-  
-
-  async getProductByUserId(userId: number) {
-    const product = await repository.findByUserId(userId);
-    if (!product) {
+  async getProductByUserId(id: number) {
+    try {
+      const products = await repository.findByUserId(id);
+      if (!products || products.length === 0) {
+        return {
+          success: false,
+          message: 'No products found for this user',
+          statusCode: 404,
+        };
+      }
+      return {
+        success: true,
+        data: products,
+      };
+    } catch (error: any) {
       return {
         success: false,
-        message: 'Product not found',
-        statusCode: 404,
+        message: error.message || 'Failed to fetch user products',
+        statusCode: 500,
       };
     }
-    return {
-      success: true,
-      data: product,
-    };
   }
 
   async createProduct(data: CreateProductInput) {
@@ -66,7 +92,7 @@ export class ProductService {
       return {
         success: false,
         message: error.message || 'Failed to create product',
-        statusCode: error.statusCode || 500,
+        statusCode: 500,
       };
     }
   }
@@ -107,7 +133,7 @@ export class ProductService {
       return {
         success: false,
         message: error.message || 'Failed to update product',
-        statusCode: error.statusCode || 500,
+        statusCode: 500,
       };
     }
   }
@@ -132,7 +158,7 @@ export class ProductService {
       return {
         success: false,
         message: error.message || 'Failed to delete product',
-        statusCode: error.statusCode || 500,
+        statusCode: 500,
       };
     }
   }
