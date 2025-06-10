@@ -1,0 +1,62 @@
+version: '3.9'
+
+services:
+
+  db:
+      image: mysql:8.0 # Or your preferred MySQL version
+      ports:
+        - "3306:3306"
+      environment:
+        MYSQL_ROOT_PASSWORD: Qwer1234@ # This should match your DATABASE_URL password
+        MYSQL_DATABASE: api_dev # This should match your DATABASE_URL database name
+      volumes:
+        - db_data:/var/lib/mysql # Persist data
+      networks:
+        - backend
+
+  user:
+      build: ./user
+      ports:
+        - "3000:3000"
+      networks:
+        - backend
+      environment:
+        # Environment variables for the product service
+        NODE_ENV: development
+        PORT: 3000
+        API_PREFIX: /api/v1
+        CORS_ORIGINS: http://localhost:3000,http://localhost:8080
+        DATABASE_URL: mysql://root:Qwer1234@@db:3306/api_dev # Connects to the 'db' service
+        LOG_LEVEL: debug
+        RATE_LIMIT_WINDOW_MS: 900000
+        RATE_LIMIT_MAX: 100
+        PRODUCT_SERVICE_URL: http://product:3000
+      depends_on:
+      - db # Ensure db starts before user
+      - product
+  product:
+    build: ./product
+    ports:
+      - "3001:3000"
+    networks:
+      - backend
+    environment:
+      # Environment variables for the product service
+      NODE_ENV: development
+      PORT: 3001
+      API_PREFIX: /api/v1
+      CORS_ORIGINS: http://localhost:3000,http://localhost:8080
+      DATABASE_URL: mysql://root:Qwer1234@@db:3306/api_dev # Connects to the 'db' service
+      LOG_LEVEL: debug
+      RATE_LIMIT_WINDOW_MS: 900000
+      RATE_LIMIT_MAX: 100
+      
+    depends_on:
+      - db
+
+networks:
+  backend:
+    driver: bridge
+
+volumes:
+  db_data:
