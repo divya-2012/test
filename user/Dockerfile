@@ -10,6 +10,7 @@ RUN npm ci
 # Copy source code
 COPY . .
 # Generate prisma client
+RUN ls -la /app/src/repositories && ls -la /app/src/schemas
 RUN npx prisma generate
 # Build the app
 RUN npm run build
