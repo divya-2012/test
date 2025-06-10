@@ -3,20 +3,20 @@ WORKDIR /app
 COPY package*.json ./
 
 FROM base AS builder
+# Pass build-time args
+ARG DATABASE_URL
+ENV DATABASE_URL=$DATABASE_URL
 RUN npm ci
 COPY . .
-# Ensure all files are copied properly
-RUN ls -la /app/src/repositories && ls -la /app/src/schemas
 RUN npx prisma generate
-RUN npx prisma migrate deploy
 RUN npm run build
 
 FROM base AS production
+# Pass runtime environment variables
+ENV DATABASE_URL=${DATABASE_URL}
 ENV NODE_ENV=production
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/prisma ./prisma
-
-
 EXPOSE 3000
-CMD ["npm", "start"]
+CMD ["node", "dist/index.js"]
