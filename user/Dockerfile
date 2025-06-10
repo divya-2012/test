@@ -21,5 +21,10 @@ COPY --from=builder /app/prisma ./prisma
 # Copy environment files again
 COPY --from=builder /app/.env* ./
 
+# Copy and make entrypoint executable
+COPY entrypoint.sh .
+RUN chmod +x entrypoint.sh
+
 EXPOSE 3000
-CMD ["node", "dist/index.js"]
+# Use the entrypoint as the sole command
+CMD ["./entrypoint.sh"]
