@@ -18,8 +18,6 @@ RUN npm run build
 FROM base AS production
 # Set NODE_ENV
 ENV NODE_ENV=production
-# Install production dependencies only
-RUN npm ci --production
 # Copy build artifacts and necessary files
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/prisma ./prisma
