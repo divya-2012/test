@@ -2,31 +2,24 @@ FROM node:20-alpine AS base
 WORKDIR /app
 COPY package*.json ./
 
-FROM node:20-alpine as builder
-
-WORKDIR /app
-
-COPY package*.json ./
-RUN npm install
-
+FROM base AS builder
+# Copy environment files if they exist
+COPY .env* ./
 COPY prisma ./prisma/
 COPY tsconfig.json .
 COPY src ./src/
-
+RUN npm ci
 RUN npx prisma generate
-RUN npx prisma migrate deploy
 RUN npm run build
 
-FROM node:20-alpine
-
-WORKDIR /app
-
-COPY --from=builder /app/package*.json ./
+FROM base AS production
+ENV NODE_ENV=production
+# Copy built files
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/prisma ./prisma
-
+# Copy environment files again
+COPY --from=builder /app/.env* ./
 
 EXPOSE 3001
-
 CMD ["node", "dist/index.js"]
