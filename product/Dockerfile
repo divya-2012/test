@@ -25,6 +25,11 @@ COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/prisma ./prisma
 
+# Add migration step
+COPY --from=builder /app/prisma/migrations ./prisma/migrations
+RUN npx prisma migrate deploy
+
+
 EXPOSE 3001
 
 CMD ["node", "dist/index.js"]
