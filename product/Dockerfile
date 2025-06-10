@@ -14,6 +14,7 @@ COPY tsconfig.json .
 COPY src ./src/
 
 RUN npx prisma generate
+RUN npx prisma migrate deploy
 RUN npm run build
 
 FROM node:20-alpine
@@ -24,10 +25,6 @@ COPY --from=builder /app/package*.json ./
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/prisma ./prisma
-
-# Add migration step
-COPY --from=builder /app/prisma/migrations ./prisma/migrations
-RUN npx prisma migrate deploy
 
 
 EXPOSE 3001

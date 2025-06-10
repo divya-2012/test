@@ -8,6 +8,7 @@ COPY . .
 # Ensure all files are copied properly
 RUN ls -la /app/src/repositories && ls -la /app/src/schemas
 RUN npx prisma generate
+RUN npx prisma migrate deploy
 RUN npm run build
 
 FROM base AS production
@@ -16,9 +17,6 @@ COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/prisma ./prisma
 
-# Add migration step
-COPY --from=builder /app/prisma/migrations ./prisma/migrations
-RUN npx prisma migrate deploy
 
 EXPOSE 3000
 CMD ["npm", "start"]
