@@ -22,9 +22,9 @@ COPY --from=builder /app/prisma ./prisma
 COPY --from=builder /app/.env* ./
 
 # Copy and make entrypoint executable
-COPY entrypoint.sh .
+# COPY entrypoint.sh .
 # RUN chmod +x entrypoint.sh
 
 EXPOSE 3000
 # Use the entrypoint as the sole command
-CMD ["./entrypoint.sh"]
+# CMD ["./entrypoint.sh"]
