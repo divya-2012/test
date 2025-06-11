@@ -23,7 +23,7 @@ COPY --from=builder /app/.env* ./
 
 # Copy and make entrypoint executable
 COPY entrypoint.sh .
-RUN chmod +x entrypoint.sh
+# RUN chmod +x entrypoint.sh
 
 EXPOSE 3001
 # Use the entrypoint as the sole command
